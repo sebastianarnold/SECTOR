@@ -1,10 +1,7 @@
-package de.datexis.sector.exec;
-
 import de.datexis.common.*;
 import de.datexis.common.CommandLineParser;
 import de.datexis.encoder.impl.*;
 import de.datexis.model.*;
-import de.datexis.rnn.loss.MultiClassDosSantosPairwiseRankingLoss;
 import de.datexis.sector.SectorAnnotator;
 import de.datexis.sector.encoder.*;
 import de.datexis.sector.model.SectionAnnotation;
@@ -38,7 +35,7 @@ public class TrainSectorAnnotator {
       System.exit(0);
     } catch(ParseException e) {
       HelpFormatter formatter = new HelpFormatter();
-      formatter.printHelp("texoo-train-sector", "TeXoo: train SectorAnnotator from WikiSection dataset", params.setUpCliOptions(), "", true);
+      formatter.printHelp("sector-train", "SECTOR: train SectorAnnotator from WikiSection dataset", params.setUpCliOptions(), "", true);
       System.exit(1);
     } catch(Exception e) {
       e.printStackTrace();
@@ -123,7 +120,7 @@ public class TrainSectorAnnotator {
     SectorAnnotator sector = builder
       .withDataset(train.getName(), lang)
       .withModelParams(0, 256, 128)                     // ffwLayerSize, lstmLayerSize, embeddingLayerSize is hardcoded here
-      .withTrainingParams(0.01, 0.5, 256, 396, 16, 10) // learningrate, dropout, epochsize, maxlength, batchsize, epochs is hardcoded here
+      .withTrainingParams(0.01, 0.5, 2048, 396, 16, 10) // learningrate, dropout, epochsize, maxlength, batchsize, epochs is hardcoded here
       .enableTrainingUI(params.trainingUI)
       .build();
 
@@ -132,7 +129,7 @@ public class TrainSectorAnnotator {
 
       // Train model
       if(validation == null) sector.trainModel(train);
-      else sector.trainModelEarlyStopping(train, validation, 2, 2, 10); // minepochs, tryepochs, maxepochs is hardcoded here
+      else sector.trainModelEarlyStopping(train, validation, 10, 10, 100); // minepochs, tryepochs, maxepochs is hardcoded here
 
       // Save model
       output = output.resolve(sector.getTagger().getName());

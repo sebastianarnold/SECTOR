@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# SECTOR run script
+#
+
+# number of threads used for CPU calculation
+export OMP_NUM_THREADS=4
+
+# CUDA device numbers visible to the process
+export CUDA_VISIBLE_DEVICES=1
+
+# device priorities, higher is preferred
+export BACKEND_PRIORITY_CPU=2 # prefer CPU for training (for compatibility reasons)
+export BACKEND_PRIORITY_GPU=1
+
+# set memory limits to 4GB (Java) and 16GB (DL4j Host Memory)
+export MAVEN_OPTS="-XX:+UseG1GC -Xms1G -Xmx4G -Dorg.bytedeco.javacpp.maxbytes=16G -Dorg.bytedeco.javacpp.maxphysicalbytes=20G"
+
+# exec Maven:
+mvn -e -B -q -DskipTests=true \
+  compile exec:java -Dexec.mainClass="TrainSectorAnnotator" -Dexec.args="$*"

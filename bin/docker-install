@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+# build a docker image from local directory
+#
+
+docker build -t texoo .

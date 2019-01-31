@@ -28,11 +28,6 @@ ENV MAVEN_HOME /opt/maven
 
 # Resolve dependencies at install time
 COPY pom.xml /tmp/pom.xml
-COPY texoo-core/pom.xml /tmp/texoo-core/pom.xml
-COPY texoo-examples/pom.xml /tmp/texoo-examples/pom.xml
-COPY texoo-entity-recognition/pom.xml /tmp/texoo-entity-recognition/pom.xml
-COPY texoo-entity-linking/pom.xml /tmp/texoo-entity-linking/pom.xml
-COPY texoo-sector/pom.xml /tmp/texoo-sector/pom.xml
 RUN mvn -B -f /tmp/pom.xml verify --fail-never
 
 # Define working directory

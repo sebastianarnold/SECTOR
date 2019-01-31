@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+# start the docker container and mount the local directory as /usr/src
+#
+
+docker run -v "$(pwd)":/usr/src -it texoo "$@"
