@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>de.datexis</groupId>
+  <artifactId>sector</artifactId>
+  <version>1.1.1-fork</version>
+  <packaging>jar</packaging>
+  
+  <name>SECTOR</name>
+  <description>A Neural Model for Coherent Topic Segmentation and Classification</description>
+  <url>https://github.com/sebastianarnold/SECTOR</url>
+
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Sebastian Arnold</name>
+      <email>sarnold@beuth-hochschule.de</email>
+      <organization>DATEXIS</organization>
+      <organizationUrl>http://www.datexis.de</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git://github.com/sebastianarnold/SECTOR.git</connection>
+    <developerConnection>scm:git:git://github.com/sebastianarnold/SECTOR.git</developerConnection>
+    <url>https://github.com/sebastianarnold/SECTOR</url>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <java.version>1.8</java.version>
+    <texoo.version>1.1.1-SNAPSHOT</texoo.version>
+    <slf4j.version>1.7.25</slf4j.version>
+    <logback.version>1.2.3</logback.version>
+    <dl4j.version>1.0.0-beta3</dl4j.version>
+    <nd4j.backend>nd4j-native</nd4j.backend>
+    <maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
+    <exec-maven-plugin.version>1.4.0</exec-maven-plugin.version>
+    <mockito-core.version>2.10.0</mockito-core.version>
+    <java-hamcrest.version>2.0.0.0</java-hamcrest.version>
+    <doclint>none</doclint>
+  </properties>
+  
+  <build>
+    <resources>
+      <resource>
+        <!-- Copy properties with filtering -->
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.properties.template</include>
+        </includes>
+      </resource>
+      <resource>
+        <!-- Copy everything else unfiltered -->
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>**/*.properties</exclude>
+          <exclude>**/*.properties.template</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <!-- Set Max RAM usage for unit tests -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.19.1</version>
+        <configuration>
+          <forkCount>1</forkCount>
+          <reuseForks>true</reuseForks>
+          <argLine>-Xms1G -Xmx4G -XX:+UseG1GC -Dorg.bytedeco.javacpp.maxbytes=4G -Dorg.bytedeco.javacpp.maxphysicalbytes=8G</argLine>
+          <trimStackTrace>false</trimStackTrace>
+        </configuration>
+      </plugin>
+      <plugin>
+        <!-- Plugin for mvn:exec-java -->
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>${exec-maven-plugin.version}</version>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    
+    <!-- Logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+
+    <!-- Deeplearning4j -->
+    <!-- Apache 2.0 License https://deeplearning4j.org/ -->
+    <dependency>
+      <groupId>org.deeplearning4j</groupId>
+      <artifactId>deeplearning4j-core</artifactId>
+      <version>${dl4j.version}</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.deeplearning4j</groupId>
+      <artifactId>deeplearning4j-nlp</artifactId>
+      <version>${dl4j.version}</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.nd4j</groupId>
+      <artifactId>${nd4j.backend}</artifactId>
+      <version>${dl4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.nd4j</groupId>
+      <artifactId>nd4j-native</artifactId>
+      <version>${dl4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.deeplearning4j</groupId>
+      <artifactId>deeplearning4j-ui_2.11</artifactId>
+      <version>${dl4j.version}</version>
+      <type>jar</type>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.deeplearning4j</groupId>
+      <artifactId>deeplearning4j-parallel-wrapper</artifactId>
+      <version>${dl4j.version}</version>
+      <type>jar</type>
+    </dependency>
+    <!-- ND4j CUDA -->
+    <dependency>
+      <groupId>org.nd4j</groupId>
+      <artifactId>nd4j-cuda-9.2-platform</artifactId>
+      <version>${dl4j.version}</version>
+    </dependency>
+    <!-- DL4j cuDNN -->
+    <dependency>
+      <groupId>org.deeplearning4j</groupId>
+      <artifactId>deeplearning4j-cuda-9.2</artifactId>
+      <version>${dl4j.version}</version>
+    </dependency>
+    <!-- DL4j CUDA + cuDNN binaries -->
+    <dependency>
+     <groupId>org.bytedeco.javacpp-presets</groupId>
+     <artifactId>cuda</artifactId>
+     <version>9.2-7.1-1.4.2</version>
+     <classifier>linux-x86_64-redist</classifier>
+    </dependency>
+    
+    <!-- Apache OpenNLP (Apache V2 License) -->
+    <dependency>
+      <groupId>org.apache.opennlp</groupId>
+      <artifactId>opennlp-tools</artifactId>
+      <version>1.9.0</version>
+    </dependency>
+    
+    <!-- updated XML helpers -->
+    <dependency>
+        <groupId>xerces</groupId>
+        <artifactId>xercesImpl</artifactId>
+        <version>2.11.0</version>
+    </dependency>
+    <dependency>
+        <groupId>xml-apis</groupId>
+        <artifactId>xml-apis</artifactId>
+        <version>1.4.01</version>
+    </dependency>
+    
+    <!-- Miscellaneous helpers -->
+    <dependency>
+      <groupId>info.debatty</groupId>
+      <artifactId>java-string-similarity</artifactId>
+      <version>1.1.0</version>
+      <!-- MIT License https://github.com/tdebatty/java-string-similarity/ -->
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.6.5</version>
+      <!-- Apache 2.0 License https://github.com/FasterXML/jackson -->
+    </dependency>
+    <dependency>
+      <groupId>com.optimaize.languagedetector</groupId>
+      <artifactId>language-detector</artifactId>
+      <version>0.6</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
+      <!-- Apache 2.0 License https://github.com/optimaize/language-detector -->
+    </dependency>
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <version>0.9.11</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>commons-cli</groupId>
+      <artifactId>commons-cli</artifactId>
+      <version>1.4</version>
+    </dependency>
+    
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>java-hamcrest</artifactId>
+      <version>${java-hamcrest.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito-core.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+  </dependencies>
+
+</project>
+

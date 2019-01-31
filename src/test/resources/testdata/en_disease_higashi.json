@@ -1,0 +1,50 @@
+ {
+  "id" : "https://en.wikipedia.org/wiki/Chédiak–Higashi_syndrome",
+  "type" : "disease",
+  "title" : "Chédiak–Higashi syndrome",
+  "abstract" : "Chédiak–Higashi syndrome is a rare autosomal recessive disorder that arises from a mutation of a lysosomal trafficking regulator protein, which leads to a decrease in phagocytosis. The decrease in phagocytosis results in recurrent pyogenic infections, albinism and peripheral neuropathy. It occurs in humans, cattle, blue Persian cats, Australian blue rats, mice, mink, foxes, and the only known captive white orca.\n",
+  "text" : "People with CHS have light skin and silvery hair (albinism) and frequently complain of solar sensitivity and photophobia. Other signs and symptoms vary considerably, but frequent infections and neuropathy are common. The infections involve mucous membranes, skin, and the respiratory tract. Affected children are susceptible to infection by Gram-positive and gram-negative bacteria and fungi, with Staphylococcus aureus being the most common infection cause. Infections in CHS patients tend to be very serious and even life-threatening. Neuropathy often begins in the teenage years and becomes the most prominent problem. Few patients with this condition live to adulthood.\nMost children with Chédiak–Higashi syndrome ultimately reach a stage known as the \"accelerated phase\", or the \"lymphoma-like syndrome\", in which defective white blood cells divide uncontrollably and invade many of the body's organs. The accelerated phase is associated with fever, episodes of abnormal bleeding, overwhelming infections, and organ failure. These medical problems are usually life-threatening in childhood.\nMutations in the CHS1 gene (also called LYST) have been found to be connected with Chédiak–Higashi Syndrome. This gene provides instructions for making a protein known as the lysosomal trafficking regulator. Researchers believe that this protein plays a role in the transport (trafficking) of materials into lysosomes.\nLysosomes act as recycling centers within cells. They use digestive enzymes to break down toxic substances, digest bacteria that invade the cell, and recycle worn-out cell components. Although the lysosomal trafficking regulator protein is involved in the normal function of lysosomes, its exact role is unknown.\nCHS is a disease causing impaired bacteriolysis due to failure of phagolysosome formation. As a result of disordered intracellular trafficking there is impaired lysosome degranulation with phagosomes, so phagocytosed bacteria are not destroyed by the lysosome's enzymes.\nIn addition, secretion of lytic secretory granules by cytotoxic T cells is affected.\nThe disease is characterised by large lysosome vesicles in phagocytes (neutrophils), which thus have poor bactericidal function, leading to susceptibility to infections, abnormalities in nuclear structure of leukocytes, anemia, and hepatomegaly.\nDöhle bodies (remnants of endoplasmic reticulum) in the neutrophil are also seen.\nThe diagnosis is confirmed by bone marrow smears that show \"giant inclusion bodies\" in the cells that develop into white blood cells (leukocyte precursor cells). CHS can be diagnosed prenatally by examining a sample of hair from a fetal scalp biopsy or testing leukocytes from a fetal blood sample.\nUnder light microscopy the hairs present evenly distributed, regular melanin granules, larger than those found in normal hairs. Under polarized light microscopy these hairs exhibit a bright and polychromatic refringence pattern.\nThere are several manifestations of Chédiak–Higashi syndrome as mentioned above; however, neutropenia seems to be the most common. The syndrome is associated with oculocutaneous albinism. Persons are prone for infections, especially with Staphylococcus aureus, as well as Streptococci.\nIt is associated with periodontal disease of the deciduous dentition. Associated features include abnormalities in melanocytes (albinism), nerve defects, bleeding disorders.\nThere is no specific treatment for Chédiak–Higashi syndrome. Bone marrow transplants appear to have been successful in several patients. Infections are treated with antibiotics and abscesses are surgically drained when appropriate. Antiviral drugs such as acyclovir have been tried during the\nterminal phase of the disease. Cyclophosphamide and prednisone have been tried. Vitamin C therapy has improved immune function and clotting in some patients.\nIt is named for the Cuban physician and serologist Alejandro Moisés Chédiak (1903–1993) and the Japanese pediatrician Otokata Higashi (1883–1981). It is often spelled without the accent as Chediak–Higashi syndrome.\n",
+  "annotations" : [ {
+    "class" : "SectionAnnotation",
+    "begin" : 0,
+    "length" : 1096,
+    "sectionHeading" : "Signs and symptoms",
+    "sectionLabel" : "disease.symptom"
+  }, {
+    "class" : "SectionAnnotation",
+    "begin" : 1096,
+    "length" : 632,
+    "sectionHeading" : "Causes",
+    "sectionLabel" : "disease.cause"
+  }, {
+    "class" : "SectionAnnotation",
+    "begin" : 1728,
+    "length" : 684,
+    "sectionHeading" : "Pathophysiology",
+    "sectionLabel" : "disease.pathophysiology"
+  }, {
+    "class" : "SectionAnnotation",
+    "begin" : 2412,
+    "length" : 528,
+    "sectionHeading" : "Diagnosis",
+    "sectionLabel" : "disease.diagnosis"
+  }, {
+    "class" : "SectionAnnotation",
+    "begin" : 2940,
+    "length" : 460,
+    "sectionHeading" : "Diagnosis | Clinical findings",
+    "sectionLabel" : "disease.diagnosis"
+  }, {
+    "class" : "SectionAnnotation",
+    "begin" : 3400,
+    "length" : 451,
+    "sectionHeading" : "Treatment",
+    "sectionLabel" : "disease.treatment"
+  }, {
+    "class" : "SectionAnnotation",
+    "begin" : 3851,
+    "length" : 215,
+    "sectionHeading" : "Eponym",
+    "sectionLabel" : "disease.etymology"
+  } ]
+}

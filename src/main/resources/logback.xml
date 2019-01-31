@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true" scanPeriod="30 seconds"> 
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{dd.MM.yy HH:mm:ss} %-5level %logger{36} %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="info">
+    <appender-ref ref="STDOUT" />
+  </root>
+  
+  <logger name="ch.qos.logback" level="WARN"/>
+  <logger name="org.reflections.Reflections" level="INFO"/>
+  <logger name="org.deeplearning4j.ui" level="WARN"/>
+  <logger name="com.optimaize.langdetect" level="WARN"/>
+  <logger name="org.reflections" level="ERROR"/>
+  <logger name="de.datexis" level="DEBUG"/>
+  
+</configuration>

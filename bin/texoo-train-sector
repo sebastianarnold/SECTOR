@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# TeXoo run script
+#
+
+# configure environment:
+bin/texoo-env
+
+# main class to run:
+CLASS=de.datexis.sector.exec.TrainSectorAnnotator
+
+# TODO: check if texoo is already compiled
+
+# exec Maven:
+mvn -e -B -q -DskipTests=true \
+  -pl texoo-sector exec:java -Dexec.mainClass="$CLASS" -Dexec.args="$*"
