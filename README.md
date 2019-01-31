@@ -4,6 +4,8 @@ This is a fork of [TeXoo 1.1.1](https://github.com/sebastianarnold/TeXoo) that c
 
 Sebastian Arnold, Rudolf Schneider, Philippe Cudré-Mauroux, Felix A. Gers and Alexander Löser. "SECTOR: A Neural Model for Coherent Topic Segmentation and Classification." Transactions of the Association for Computational Linguistics (2019).
 
+The corresponding WikiSection Dataset can be obtained [here](https://github.com/sebastianarnold/WikiSection).
+
 ## Getting Started
 
 These instructions will get you a copy of SEC up and running on your local machine for development and testing purposes. If you are going to use TeXoo as a Maven dependency only, you might skip this step.
