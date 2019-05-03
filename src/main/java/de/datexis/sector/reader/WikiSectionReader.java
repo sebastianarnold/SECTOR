@@ -39,7 +39,8 @@ public class WikiSectionReader implements DatasetReader {
         ann.setSource(Annotation.Source.GOLD);
         ann.setConfidence(1.0);
       }
-      result.addDocument(doc);
+      if(!doc.isEmpty()) result.addDocument(doc);
+      else log.warn("read empty document {}", doc.getId());
     }
     return result;
   }

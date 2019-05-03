@@ -4,7 +4,7 @@
   
   <groupId>de.datexis</groupId>
   <artifactId>sector</artifactId>
-  <version>1.1.1-fork</version>
+  <version>1.1.2-fork</version>
   <packaging>jar</packaging>
   
   <name>SECTOR</name>
@@ -38,7 +38,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <java.version>1.8</java.version>
-    <texoo.version>1.1.1-SNAPSHOT</texoo.version>
+    <texoo.version>1.1.2</texoo.version>
     <slf4j.version>1.7.25</slf4j.version>
     <logback.version>1.2.3</logback.version>
     <dl4j.version>1.0.0-beta3</dl4j.version>

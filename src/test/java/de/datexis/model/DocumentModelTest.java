@@ -27,7 +27,7 @@ public class DocumentModelTest {
   final private String deText = "Prof. Dr. Alexander Löser ist Professor an der Beuth Hochschule für Technik Berlin.";
 
   final private String tabText = "123\tabc\n\n\nxyz  789\t\n 456 ";
-  final private String spcText = "123 abc\n  xyz  789 \n 456"; // tabs and trailing whitespace is removed
+  final private String spcText = "123 abc\n\n\nxyz  789 \n 456"; // tabs and trailing whitespace is removed
 
   final private String originalText = "In March 2009 mayor Sue Jones-Davies, who had played the role of Judith Iscariot in the film Monty Python's Life of Brian (1979), organised a charity screening of the film.";
   final private String tokenizedText = "In March 2009 mayor Sue Jones-Davies , who had played the role of Judith Iscariot in the film Monty Python 's Life of Brian ( 1979 ) , organised a charity screening of the film .";
@@ -64,7 +64,7 @@ public class DocumentModelTest {
   public void testTokenization() {
     Document doc = DocumentFactory.fromText(tabText, DocumentFactory.Newlines.KEEP); // "123\tabc\n\n\nxyz  789\t\n 456 "
     assertEquals(3, doc.countSentences());
-    assertEquals(7, doc.countTokens());
+    assertEquals(9, doc.countTokens()); // NLs count as tokens
     assertEquals(0, doc.getBegin());
     assertEquals(spcText.length(), doc.getEnd());
     assertEquals(spcText.length(), doc.getLength());
@@ -99,19 +99,19 @@ public class DocumentModelTest {
     assertEquals(198, doc.getLength());
     assertEquals(medText, doc.getText());
     assertEquals("(", doc.getSentence(0).getToken(5).getText());
-    assertEquals("e.g.", doc.getSentence(0).getToken(6).getText()); // FIXME: abbreviations are not correctly tokenized
+    assertEquals("e.g.", doc.getSentence(0).getToken(6).getText());
     assertEquals("1", doc.getSentence(0).getToken(25).getText());
     assertEquals(152, doc.getSentence(1).getToken(0).getBegin());
     assertEquals(7, doc.getSentence(1).getToken(0).getLength());
     assertEquals(159, doc.getSentence(1).getToken(0).getEnd());
     Document doc2 = DocumentFactory.fromText(deText);
     assertEquals(1, doc2.countSentences());
-    assertEquals(14, doc2.countTokens()); // FIXME: abbreviations are not correctly tokenized
+    assertEquals(14, doc2.countTokens());
     assertEquals(0, doc2.getBegin());
     assertEquals(83, doc2.getEnd());
     assertEquals(83, doc2.getLength());
     assertEquals(deText, doc2.getText());
-    assertEquals("Dr.", doc2.getSentence(0).getToken(1).getText()); // FIXME: abbreviations are not correctly tokenized
+    assertEquals("Dr.", doc2.getSentence(0).getToken(1).getText());
     assertEquals("Löser", doc2.getSentence(0).getToken(3).getText());
     Document doc3 = DocumentFactory.fromText(punctText);
     for (Sentence s : doc3.getSentences()) {
@@ -127,7 +127,7 @@ public class DocumentModelTest {
       doc.addSentence(s);
     }
     assertEquals(3, doc.countSentences());
-    assertEquals(36 + 14, doc.countTokens()); // FIXME: abbreviations are not correctly tokenized
+    assertEquals(36 + 14, doc.countTokens());
     assertEquals(0, doc.getBegin());
     assertEquals(198 + 83 + 1, doc.getEnd());
     assertEquals(198 + 83 + 1, doc.getLength());

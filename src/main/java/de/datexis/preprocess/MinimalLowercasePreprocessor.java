@@ -12,6 +12,7 @@ public class MinimalLowercasePreprocessor implements TokenPreProcess {
   @Override
   public String preProcess(String token) {
     if(token == null) return null;
+    token = token.trim();
     token = WordHelpers.replaceUmlauts(token);
     token = WordHelpers.replaceAccents(token);
     token = WordHelpers.replacePunctuation(token, "");

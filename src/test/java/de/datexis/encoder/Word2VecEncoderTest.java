@@ -56,14 +56,12 @@ public class Word2VecEncoderTest {
     assertTrue(bin.isUnknown("#-minuten-takt"));
     assertTrue(bin.isUnknown("Berlin Berlin"));
     assertTrue(bin.isUnknown("Berlin Küstenstraße"));
-    System.out.println(vec.encode("berlin"));
-    System.out.println(bin.encode("berlin"));
     assertEquals(vec.encode("berlin"), bin.encode("berlin"));
-    assertEquals(Nd4j.zeros(150), vec.encode("DATEXIS")); // unknown word should give nullvector
-    assertNotEquals(Nd4j.zeros(150), vec.encode("berlin"));
+    assertEquals(Nd4j.zeros(150, 1), vec.encode("DATEXIS")); // unknown word should give nullvector
+    assertNotEquals(Nd4j.zeros(150, 1), vec.encode("berlin"));
     assertEquals(vec.encode("Berlin"), vec.encode("Berlin Berlin")); // should be mean vector
-    assertNotEquals(Nd4j.zeros(150), vec.encode("DATEXIS Berlin")); // should not be totally unknown
-    assertNotEquals(Nd4j.zeros(150), vec.encode("Berlin Küstenstraße"));
+    assertNotEquals(Nd4j.zeros(150, 1), vec.encode("DATEXIS Berlin")); // should not be totally unknown
+    assertNotEquals(Nd4j.zeros(150, 1), vec.encode("Berlin Küstenstraße"));
     assertNotEquals(vec.encode("Berlin"), vec.encode("Berlin Küstenstraße")); // should be something different
   }
   

@@ -72,4 +72,12 @@ public class DocumentFactoryTest {
     Assert.assertEquals(text.replace("\n", " ").replace("\u00a0", " "), doc.getText());
   }
   
+  @Test
+  public void testDoubleNewlines() {
+    String text = "sentence.\n\nEEG:\nEEG Lorem ipsum dolor";
+    Document doc = DocumentFactory.fromText(text,DocumentFactory.Newlines.KEEP);
+    Assert.assertEquals(text, doc.getText());
+    Assert.assertEquals("sentence.\n\n", doc.getSentence(0).getText());
+  }
+  
 }

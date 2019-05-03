@@ -229,7 +229,7 @@ public class SentenceDetectorMENL extends SentenceDetectorME {
   }
 
   private int getFirstNonWS(String s, int pos) {
-    while (pos < s.length() && StringUtil.isWhitespace(s.charAt(pos)) && s.charAt(pos) != '\n')
+    while (pos < s.length() && StringUtil.isWhitespace(s.charAt(pos)))
       pos++;
     return pos;
   }

@@ -131,7 +131,7 @@ public class RawTextDatasetReader implements DatasetReader {
         doc.setSource(file.toString());
         if(useFirstSentenceAsTitle) {
           if(doc.countSentences() > 0) {
-            doc.setTitle(doc.getSentence(0).getText());
+            doc.setTitle(doc.getSentence(0).getText().trim());
           } else {
             doc.setTitle("");
           }

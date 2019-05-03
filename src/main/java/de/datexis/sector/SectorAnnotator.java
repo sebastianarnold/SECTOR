@@ -86,10 +86,11 @@ public class SectorAnnotator extends Annotator {
 
   /**
    * Annotate given Documents using SECTOR, i.e. attach SectorAnnotator vectors to sentences.
+   * This function also attaches SectionAnnotations to each Document by using the BEMD strategy.
    */
   @Override
   public void annotate(Collection<Document> docs) {
-    annotate(docs, SegmentationMethod.NONE);
+    annotate(docs, SegmentationMethod.BEMD);
   }
 
   /**

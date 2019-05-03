@@ -84,8 +84,8 @@ public class INDArrayTest {
       INDArray ret = Nd4j.read(dis);
       dis.close();
       
-      System.out.println(arr);
-      System.out.println(ret);
+      System.out.println(arr.transpose());
+      System.out.println(ret.transpose());
       
       assertEquals(arr, ret);
       

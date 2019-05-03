@@ -1,8 +1,20 @@
 # SECTOR: A Neural Model for Coherent Topic Segmentation and Classification
 
-This is a fork of [TeXoo 1.1.1](https://github.com/sebastianarnold/TeXoo) that contains a standalone implementation of SECTOR from the following paper:
+This is a fork of [TeXoo 1.1.2](https://github.com/sebastianarnold/TeXoo) that contains a standalone implementation of SECTOR from the following paper:
 
-Sebastian Arnold, Rudolf Schneider, Philippe Cudré-Mauroux, Felix A. Gers and Alexander Löser. "SECTOR: A Neural Model for Coherent Topic Segmentation and Classification." Transactions of the Association for Computational Linguistics (2019).
+Sebastian Arnold, Rudolf Schneider, Philippe Cudré-Mauroux, Felix A. Gers and Alexander Löser. [SECTOR: A Neural Model for Coherent Topic Segmentation and Classification](https://transacl.org/ojs/index.php/tacl/article/view/1540/359)
+
+```
+@article{arnold2019sector,
+  author = {Arnold, Sebastian and Schneider, Rudolf and Cudré-Mauroux, Philippe and Gers, Felix A. and Löser, Alexander},
+  title = {SECTOR: A Neural Model for Coherent Topic Segmentation and Classification},
+  journal = {Transactions of the Association for Computational Linguistics},
+  volume = {7},
+  pages = {169-184},
+  year = {2019},
+  doi = {10.1162/tacl\_a\_00261}
+}
+```
 
 ## Getting Started
 
@@ -26,7 +38,7 @@ First we need to build a docker image with all dependencies:
 
 There exist several run scripts in the `bin/` directory. You can start them right in the docker container:
 
-- run ```bin/docker-run sector-train [args]```
+- ***Training:*** run ```bin/docker-run sector-train [args]```
 
 ```
 usage: sector-train [-e <arg>] [-h] -i <arg> [-l <arg>] -o <arg> [-t
@@ -45,6 +57,16 @@ SECTOR: train SectorAnnotator from WikiSection dataset
  -u,--ui                 enable training UI (http://127.0.0.1:9000)
  -v,--validation <arg>   file name of WikiSection validation dataset (will
                          use early stopping if given)
+```
+
+- ***Evaluation:*** run ```bin/docker-run sector-eval [args]```
+```
+usage: sector-eval [-e <arg>] -m <arg> -t <arg>
+SECTOR: evaluate SectorAnnotator on WikiSection dataset
+ -e,--embedding <arg>   search path to word embedding models (if not
+                        provided by the model itself)
+ -m,--model <arg>       path to the pre-trained model
+ -t,--test <arg>        file name of WikiSection test dataset
 ```
 
 ## License
