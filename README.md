@@ -16,6 +16,8 @@ Sebastian Arnold, Rudolf Schneider, Philippe Cudré-Mauroux, Felix A. Gers and A
 }
 ```
 
+The corresponding WikiSection Dataset can be obtained [here](https://github.com/sebastianarnold/WikiSection).
+
 ## Getting Started
 
 These instructions will get you a copy of SEC up and running on your local machine for development and testing purposes. If you are going to use TeXoo as a Maven dependency only, you might skip this step.
@@ -71,7 +73,7 @@ SECTOR: evaluate SectorAnnotator on WikiSection dataset
 
 ## License
 
-   Copyright 2015-2019 Sebastian Arnold, Alexander Löser, Rudolf Schneider
+   Copyright 2019 Sebastian Arnold, Alexander Löser, Rudolf Schneider
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
