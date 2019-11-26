@@ -1,21 +1,16 @@
 package de.datexis.preprocess;
 
+import de.datexis.common.WordHelpers;
+import opennlp.tools.ml.model.MaxentModel;
+import opennlp.tools.sentdetect.*;
+import opennlp.tools.util.Span;
+import opennlp.tools.util.StringUtil;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import de.datexis.common.WordHelpers;
-import opennlp.tools.ml.model.MaxentModel;
-import opennlp.tools.sentdetect.DefaultEndOfSentenceScanner;
-import opennlp.tools.sentdetect.EndOfSentenceScanner;
-import opennlp.tools.sentdetect.SDContextGenerator;
-import opennlp.tools.sentdetect.SentenceDetectorME;
-import opennlp.tools.sentdetect.SentenceModel;
-import opennlp.tools.tokenize.TokenizerME;
-import opennlp.tools.util.Span;
-import opennlp.tools.util.StringUtil;
 
 /**
  * A sentence detector for splitting up raw text into sentences.
@@ -24,14 +19,14 @@ import opennlp.tools.util.StringUtil;
  * string to determine if they signify the end of a sentence.
  */
 public class SentenceDetectorMENL extends SentenceDetectorME {
-
+  
   private MaxentModel model;
   private SDContextGenerator cgen;
   private EndOfSentenceScanner scanner;
   private List<Double> sentProbs = new ArrayList<>();
   
   public static final char[] newlineEosCharacters = new char[] { '.', '!', '?', '\n' };
-
+  
   public SentenceDetectorMENL(SentenceModel model) {
     super(model);
     initializeFieldsFromReflection();
@@ -57,7 +52,7 @@ public class SentenceDetectorMENL extends SentenceDetectorME {
       Logger.getLogger(SentenceDetectorMENL.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
-
+  
   /**
    * Detect the position of the first words of sentences in a String.
    *
@@ -68,60 +63,63 @@ public class SentenceDetectorMENL extends SentenceDetectorME {
    */
   @Override
   public Span[] sentPosDetect(String s) {
-    sentProbs.clear();
+    // create list to be thread-safe!
+    List<Double> sentProbs = new ArrayList<>();
     StringBuffer sb = new StringBuffer(s);
     List<Integer> enders = scanner.getPositions(s);
     List<Integer> positions = new ArrayList<>(enders.size());
-
+    
     for (int i = 0, end = enders.size(), index = 0; i < end; i++) {
       int cint = enders.get(i);
       // skip over the leading parts of non-token final delimiters
-      int fws = getFirstWS(s,cint + 1);
-      if (i + 1 < end && enders.get(i + 1) < fws) {
+      int fws = getFirstWS(s, cint + 1);
+      if(i + 1 < end && enders.get(i + 1) < fws) {
         continue;
       }
-      if (positions.size() > 0 && cint < positions.get(positions.size() - 1)) continue;
-
-      double[] probs = model.eval(cgen.getContext(sb, cint));
-      String bestOutcome = model.getBestOutcome(probs);
+      if(positions.size() > 0 && cint < positions.get(positions.size() - 1)) continue;
       
-      // check if this or next char is a newline
-      int nint = getFirstNonWS(s, cint + 1);
-      if(nint < s.length() && s.charAt(nint) == '\n') bestOutcome = NO_SPLIT;
-      if(s.charAt(cint) == '\n') bestOutcome = SPLIT;
-
-      if (bestOutcome.equals(SPLIT) && isAcceptableBreak(s, index, cint)) {
-        if (index != cint) {
-          if (useTokenEnd && s.charAt(cint) != '\n') {
-            positions.add(getFirstNonWS(s, getFirstWS(s,cint + 1)));
-          } else {
-            positions.add(getFirstNonWS(s, cint + 1));
+      synchronized(model) {
+        double[] probs = model.eval(cgen.getContext(sb, cint));
+        String bestOutcome = model.getBestOutcome(probs);
+        
+        // check if this or next char is a newline
+        int nint = getFirstNonWS(s, cint + 1);
+        if(nint < s.length() && s.charAt(nint) == '\n') bestOutcome = NO_SPLIT;
+        if(s.charAt(cint) == '\n') bestOutcome = SPLIT;
+        
+        if(bestOutcome.equals(SPLIT) && isAcceptableBreak(s, index, cint)) {
+          if(index != cint) {
+            if(useTokenEnd && s.charAt(cint) != '\n') {
+              positions.add(getFirstNonWS(s, getFirstWS(s, cint + 1)));
+            } else {
+              positions.add(getFirstNonWS(s, cint + 1));
+            }
+            sentProbs.add(probs[model.getIndex(bestOutcome)]);
           }
-          sentProbs.add(probs[model.getIndex(bestOutcome)]);
+          
+          index = cint + 1;
         }
-
-        index = cint + 1;
       }
     }
-
+    
     int[] starts = new int[positions.size()];
     for (int i = 0; i < starts.length; i++) {
       starts[i] = positions.get(i);
     }
-
+    
     // string does not contain sentence end positions
     if (starts.length == 0) {
-
+      
       // remove leading and trailing whitespace
       int start = 0;
       int end = s.length();
-
+      
       while (start < s.length() && StringUtil.isWhitespace(s.charAt(start)))
         start++;
-
+      
       while (end > 0 && StringUtil.isWhitespace(s.charAt(end - 1)))
         end--;
-
+      
       if (end - start > 0) {
         sentProbs.add(1d);
         return new Span[] {new Span(start, end)};
@@ -129,22 +127,22 @@ public class SentenceDetectorMENL extends SentenceDetectorME {
       else
         return new Span[0];
     }
-
+    
     // Convert the sentence end indexes to spans
-
+    
     boolean leftover = starts[starts.length - 1] != s.length();
     Span[] spans = new Span[leftover ? starts.length + 1 : starts.length];
-
+    
     for (int si = 0; si < starts.length; si++) {
       int start;
-
+      
       if (si == 0) {
         start = 0;
       }
       else {
         start = starts[si - 1];
       }
-
+      
       // A span might contain only white spaces, in this case the length of
       // the span will be zero after trimming and should be ignored.
       Span span = trimSpan(new Span(start, starts[si]), s);
@@ -155,7 +153,7 @@ public class SentenceDetectorMENL extends SentenceDetectorME {
 //        sentProbs.remove(si);
 //      }
     }
-
+    
     if (leftover) {
       Span span = trimSpan(new Span(starts[starts.length - 1], s.length()), s);
       if (span.length() > 0) {
@@ -172,24 +170,24 @@ public class SentenceDetectorMENL extends SentenceDetectorME {
         spans[i] = new Span(spans[i], prob);
       }
     }
-
+    
     return spans;
   }
-
+  
   /** trim span, but keep Newlines */
   public Span trimSpan(Span span, CharSequence text) {
-
+    
     int newStartOffset = span.getStart();
-
+    
     for (int i = span.getStart(); i < span.getEnd() && StringUtil.isWhitespace(text.charAt(i)) /*&& text.charAt(i) != '\n'*/; i++) {
       newStartOffset++;
     }
-
+    
     int newEndOffset = span.getEnd();
     for (int i = span.getEnd(); i > span.getStart() && StringUtil.isWhitespace(text.charAt(i - 1)) && text.charAt(i - 1) != '\n'; i--) {
       newEndOffset--;
     }
-
+    
     if (newStartOffset == span.getStart() && newEndOffset == span.getEnd()) {
       return span;
     } else if (newStartOffset > newEndOffset) {
@@ -221,13 +219,13 @@ public class SentenceDetectorMENL extends SentenceDetectorME {
       return false;
     return true;
   }
-
+  
   private int getFirstWS(String s, int pos) {
     while (pos < s.length() && !StringUtil.isWhitespace(s.charAt(pos)))
       pos++;
     return pos;
   }
-
+  
   private int getFirstNonWS(String s, int pos) {
     while (pos < s.length() && StringUtil.isWhitespace(s.charAt(pos)))
       pos++;

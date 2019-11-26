@@ -1,16 +1,17 @@
 import de.datexis.annotator.AnnotatorFactory;
-import de.datexis.common.*;
-import de.datexis.model.*;
+import de.datexis.common.CommandLineParser;
+import de.datexis.common.Resource;
+import de.datexis.model.Dataset;
 import de.datexis.sector.SectorAnnotator;
 import de.datexis.sector.reader.WikiSectionReader;
-import java.io.IOException;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Run experiments on a pre-trained SECTOR model

@@ -1,20 +1,20 @@
 package de.datexis.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.datexis.encoder.impl.SurfaceEncoder;
-import de.datexis.model.Annotation.Source;
 import de.datexis.preprocess.DocumentFactory;
+import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Test;
+
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
 /**
  * @author Sebastian Arnold <sarnold@beuth-hochschule.de>
@@ -52,11 +52,11 @@ public class DocumentModelTest {
     assertEquals(5, doc.getSentence(0).getToken(1).getLength());
     assertEquals(8 + 5, doc.getSentence(0).getToken(1).getEnd());
     assertEquals(0, doc.getBegin());
-    assertEquals(66, doc.getLength());
-    assertEquals(66, doc.getEnd());
+    assertEquals(65, doc.getLength());
+    assertEquals(65, doc.getEnd());
     assertEquals(0, doc.getSentence(0).getBegin());
-    assertEquals(66, doc.getSentence(0).getLength());
-    assertEquals(66, doc.getSentence(0).getEnd());
+    assertEquals(65, doc.getSentence(0).getLength());
+    assertEquals(65, doc.getSentence(0).getEnd());
     assertEquals(doc, doc.getSentence(0).getDocumentRef());
   }
 

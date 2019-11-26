@@ -3,10 +3,6 @@ package de.datexis.common;
 import com.google.common.collect.Lists;
 import de.datexis.model.Span;
 import de.datexis.model.Token;
-import java.io.IOException;
-import java.text.Normalizer;
-import java.util.*;
-import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -15,23 +11,29 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.text.Normalizer;
+import java.util.*;
+import java.util.regex.Pattern;
+
 /**
  * Utility class with static helpers for Strings
  * @author Sebastian Arnold <sarnold@beuth-hochschule.de>
  */
 public class WordHelpers {
-
+  
   protected final static Logger log = LoggerFactory.getLogger(WordHelpers.class);
-
+  
   public static HashSet<String> skipSpaceBefore = new HashSet<>(Arrays.asList(",", ".", ":", ";", "?", "!", ")", "]", "'m", "'s", "'re", "'ve", "'d", "'ll", "n't"));
   public static HashSet<String> skipSpaceAfter = new HashSet<>(Arrays.asList("(", "[", "", "\n"));
   private static final String[][] umlautReplacements = { {"Ä","Ae"}, {"Ü","Ue"}, {"Ö","Oe"}, {"ä","ae"}, {"ü","ue"}, {"ö","oe"}, {"ß","ss"}, {"–","-"} };
   private static final String[][] tokenizationReplacements = { {"``","\""}, {"''","\""} };
+  public static final Pattern dashPattern = Pattern.compile("[\\-_\\/]+");
   public static final Pattern punctPattern = Pattern.compile("[^\\w\\s\\-_]+");
   public static final Pattern spacePattern = Pattern.compile("[\\s]+");
   public static final Pattern numericPattern = Pattern.compile("[\\d]+");
   public static final Pattern bracketsPattern = Pattern.compile("[\\(\\)\\[\\]\"]");
-
+  
   // TODO: umlaute fehlen hier!
   // Lists taken from: http://www.statmt.org/europarl/ tools
   public static HashSet<String> abbreviationsEN = new HashSet<>(Arrays.asList("Adj.", "Adm.", "Adv.", "Asst.", "Bart.", "Bldg.", "Brig.", "Bros.", "Capt.", "Cmdr.", "Col.",
@@ -46,7 +48,7 @@ public class WordHelpers {
     "Mio.", "Mrd.", "bzw.", "v.", "vs.", "usw.", "d.h.", "z.B.", "u.a.", "etc.", "Mrd.", "MwSt.", "ggf.", "d.J.", "D.h.", "m.E.", "vgl.", "I.F.", "z.T.", "sogen.", "ff.",
     "u.E.", "g.U.", "g.g.A.", "c.-à-d.", "Buchst.", "u.s.w.", "sog.", "u.ä.", "Std.", "evtl.", "Zt.", "Chr.", "u.U.", "o.ä.", "Ltd.", "b.A.", "z.Zt.", "spp.", "sen.",
     "SA.", "k.o.", "jun.", "i.H.v.", "dgl.", "dergl.", "Co.", "zzt.", "usf.", "s.p.a.", "Dkr.", "Corp.", "bzgl.", "BSE.", "No.", "Nos.", "Art.", "Nr.", "pp.", "ca.", "Ca"));
-
+  
   public static enum Language { EN, DE };
   
   private final Set<String> stopWords;
@@ -94,12 +96,12 @@ public class WordHelpers {
   public static String wordsToText(Iterable<Token> tokens) {
     StringBuilder res = new StringBuilder();
     String last = "";
-		for(Token t : tokens) {
+    for(Token t : tokens) {
       if(!skipSpaceAfter.contains(last) && !skipSpaceBefore.contains(t.getText())) res.append(" ");
- 			res.append(t.getText());
+      res.append(t.getText());
       last = t.getText();
-		}
-		return res.toString().trim();
+    }
+    return res.toString().trim();
   }
   
   /**
@@ -124,14 +126,14 @@ public class WordHelpers {
         cursor++;
       }
       // append text until end of token is reached.
-      // This is important, because while Tokenization, "etc." could be converted into [etc]. [.] 
+      // This is important, because while Tokenization, "etc." could be converted into [etc]. [.]
       final String word = t.getText();
       if(t.getLength() == word.length()) res.append(word);
       else if(t.getLength() < word.length()) res.append(word.substring(0, t.getLength())); // truncate word
       else res.append(word).append(String.join("", Collections.nCopies(t.getLength() - word.length(), " "))); // add spaces
       cursor = t.getEnd();
     }
-		return res.toString();
+    return res.toString();
   }
   
   /**
@@ -141,7 +143,7 @@ public class WordHelpers {
    */
   public static double cosineSim(INDArray arr1, INDArray arr2) {
     if(arr1 == null || arr2 == null ) return 0;
-    else if(arr1.sumNumber().doubleValue() == 0 || arr2.sumNumber().doubleValue() == 0 ) return 0;
+    else if(arr1.maxNumber().doubleValue() == 0 || arr2.maxNumber().doubleValue() == 0 ) return 0;
     else return Transforms.cosineSim(arr1, arr2);
   }
   
@@ -175,9 +177,13 @@ public class WordHelpers {
   
   public static String replaceUmlauts(String str) {
     for(String[] rep : umlautReplacements) {
-        str = str.replaceAll(rep[0], rep[1]);
+      str = str.replaceAll(rep[0], rep[1]);
     }
     return str;
+  }
+  
+  public static String replaceDashes(String str, String rep) {
+    return dashPattern.matcher(str).replaceAll(rep);
   }
   
   public static String replacePunctuation(String str, String rep) {
@@ -195,7 +201,7 @@ public class WordHelpers {
   public static String[] splitSpaces(String str) {
     return str.split(spacePattern.pattern());
   }
-    
+  
   public static int getSpanOverlapLength(Span a, Span b) {
     int begin = Math.max(a.getBegin(), b.getBegin());
     int end = Math.min(a.getEnd(), b.getEnd());

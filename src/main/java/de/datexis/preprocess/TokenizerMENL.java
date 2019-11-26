@@ -17,14 +17,6 @@
 
 package de.datexis.preprocess;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import de.datexis.common.WordHelpers;
 import opennlp.tools.ml.model.MaxentModel;
 import opennlp.tools.tokenize.TokenContextGenerator;
@@ -32,6 +24,14 @@ import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
 import opennlp.tools.util.StringUtil;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * A Tokenizer for converting raw text into separated tokens (with newlines).
@@ -42,7 +42,7 @@ import opennlp.tools.util.StringUtil;
  * @author additional Newline segmentation by Sebastian Arnold, Rudolf Schneider
  */
 public class TokenizerMENL extends TokenizerME {
-
+  
   /** fields inherited from TokenizerME through reflection */
   private Pattern alphanumeric;
   private MaxentModel model;
@@ -54,7 +54,7 @@ public class TokenizerMENL extends TokenizerME {
     super(model);
     initializeFieldsFromReflection();
   }
-
+  
   private void initializeFieldsFromReflection() {
     try {
       // we need to get some fields from TokenizerME through reflection
@@ -82,7 +82,7 @@ public class TokenizerMENL extends TokenizerME {
   public Span[] tokenizePos(String s) {
     return tokenizePosWithNewline(s);
   }
-
+  
   /**
    * Adapted from WhitespaceTokenizer
    */
@@ -90,7 +90,7 @@ public class TokenizerMENL extends TokenizerME {
     int tokStart = -1;
     List<Span> tokens = new ArrayList<>();
     boolean inTok = false;
-
+    
     //gather up potential tokens
     int end = d.length();
     for (int i = 0; i < end; i++) {
@@ -120,18 +120,19 @@ public class TokenizerMENL extends TokenizerME {
         }
       }
     }
-
+    
     if (inTok) {
       tokens.add(new Span(tokStart, end));
     }
-
+    
     return tokens.toArray(new Span[tokens.size()]);
   }
   
   public Span[] tokenizePosWithNewline(String d) {
+    // make local lists to be thread-safe!
+    List<Double> tokProbs = new LinkedList<>();
+    List<Span> newTokens = new LinkedList<>();
     Span[] tokens = tokenizePosWhitespaceWithNewline(d);
-    newTokens.clear();
-    tokProbs.clear();
     for (Span s : tokens) {
       String tok = d.substring(s.getStart(), s.getEnd());
       // Can't tokenize single characters
@@ -139,9 +140,9 @@ public class TokenizerMENL extends TokenizerME {
         newTokens.add(s);
         tokProbs.add(1d);
         // TODO: include abbreviation matches
-      //} else if(tok.equals("e.g.")) {
-      //  newTokens.add(s);
-      //  tokProbs.add(1d);
+        //} else if(tok.equals("e.g.")) {
+        //  newTokens.add(s);
+        //  tokProbs.add(1d);
       } else if (useAlphaNumericOptimization() && alphanumeric.matcher(tok).matches()) {
         newTokens.add(s);
         tokProbs.add(1d);
@@ -154,22 +155,24 @@ public class TokenizerMENL extends TokenizerME {
         final int origStart = s.getStart();
         double tokenProb = 1.0;
         for (int j = origStart + 1; j < end; j++) {
-          double[] probs =
+          synchronized(model) {
+            double[] probs =
               model.eval(cg.getContext(tok, j - origStart));
-          String best = model.getBestOutcome(probs);
-          tokenProb *= probs[model.getIndex(best)];
-          if (best.equals(TokenizerME.SPLIT)) {
-            newTokens.add(new Span(start, j));
-            tokProbs.add(tokenProb);
-            start = j;
-            tokenProb = 1.0;
+            String best = model.getBestOutcome(probs);
+            tokenProb *= probs[model.getIndex(best)];
+            if (best.equals(TokenizerME.SPLIT)) {
+              newTokens.add(new Span(start, j));
+              tokProbs.add(tokenProb);
+              start = j;
+              tokenProb = 1.0;
+            }
           }
         }
         newTokens.add(new Span(start, end));
         tokProbs.add(tokenProb);
       }
     }
-
+    
     Span[] spans = new Span[newTokens.size()];
     newTokens.toArray(spans);
     return spans;
