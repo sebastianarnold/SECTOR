@@ -1,30 +1,17 @@
 package de.datexis.encoder.impl;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import de.datexis.common.*;
+import de.datexis.common.ObjectSerializer;
+import de.datexis.common.Resource;
+import de.datexis.common.WordHelpers;
 import de.datexis.encoder.Encoder;
-import de.datexis.model.*;
+import de.datexis.model.Document;
+import de.datexis.model.Sentence;
+import de.datexis.model.Span;
 import de.datexis.model.Token;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import de.datexis.preprocess.LowercasePreprocessor;
-import org.nd4j.linalg.primitives.Counter;
 import org.deeplearning4j.models.embeddings.inmemory.InMemoryLookupTable;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
-import static org.deeplearning4j.models.embeddings.loader.WordVectorSerializer.fromPair;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.models.word2vec.VocabWord;
 import org.deeplearning4j.models.word2vec.Word2Vec;
@@ -38,9 +25,16 @@ import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.ops.transforms.Transforms;
+import org.nd4j.linalg.primitives.Counter;
 import org.nd4j.linalg.primitives.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.deeplearning4j.models.embeddings.loader.WordVectorSerializer.fromPair;
 
 /**
  * A Word2Vec model from http://deeplearning4j.org/word2vec.html
@@ -234,6 +228,11 @@ public class Word2VecEncoder extends Encoder {
   
   public Class getPreprocessorClass() {
     return preprocessor.getClass();
+  }
+  
+  public void setPreprocessorClass(String preprocessor) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    Class<?> clazz = Class.forName(preprocessor);
+    this.preprocessor = (TokenPreProcess) clazz.newInstance();
   }
   
 	@Override

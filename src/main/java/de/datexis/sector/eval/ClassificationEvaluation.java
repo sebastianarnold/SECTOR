@@ -6,21 +6,18 @@ import de.datexis.model.Annotation;
 import de.datexis.model.Document;
 import de.datexis.model.Span;
 import de.datexis.model.tag.Tag;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import org.nd4j.evaluation.classification.Evaluation;
 import org.nd4j.evaluation.EvaluationAveraging;
 import org.nd4j.evaluation.EvaluationUtils;
 import org.nd4j.evaluation.IEvaluation;
+import org.nd4j.evaluation.classification.Evaluation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.primitives.Pair;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Evaluates Precision/Recall/F1 for Sentence-based class labeling (e.g. Sentence Classification).
@@ -399,7 +396,12 @@ public class ClassificationEvaluation extends AnnotatorEvaluation implements IEv
   public void eval(INDArray labels, INDArray networkPredictions, List<? extends Serializable> recordMetaData) {
     eval(labels, networkPredictions);
   }
-
+  
+  @Override
+  public void eval(INDArray labels, INDArray networkPredictions, INDArray maskArray, List<? extends Serializable> recordMetaData) {
+    eval(labels, networkPredictions, maskArray);
+  }
+  
   @Override
   public void eval(INDArray labels, INDArray networkPredictions, INDArray maskArray) {
     if(maskArray == null) {

@@ -27,12 +27,12 @@ public class DummyEncoder extends StaticEncoder {
 
   @Override
   public INDArray encode(Span span) {
-    return Nd4j.create(1).transpose();
+    return Nd4j.create(1, 1);
   }
 
   @Override
   public INDArray encode(String word) {
-    return Nd4j.create(1).transpose();
+    return Nd4j.create(1, 1);
   }
 
 }

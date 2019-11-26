@@ -1,20 +1,19 @@
 package de.datexis.encoder;
 
 import com.google.common.collect.Lists;
-
 import de.datexis.annotator.AnnotatorComponent;
-import org.nd4j.linalg.api.ndarray.INDArray;
 import de.datexis.model.Document;
 import de.datexis.model.Sentence;
 import de.datexis.model.Span;
 import de.datexis.model.Token;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.nd4j.linalg.factory.Nd4j;
 
 /**
  * An Encoder converts text (Span) to embedding vectors (INDArray).
@@ -84,8 +83,7 @@ public abstract class Encoder extends AnnotatorComponent implements IEncoder {
 
       for(int t = 0; t < spansToEncode.size() && t < maxTimeSteps; t++) {
         INDArray vec = encode(spansToEncode.get(t));
-        //encoding.put(new INDArrayIndex[] {point(batchIndex), all(), point(t)}, vec);
-        encoding.getRow(batchIndex).getColumn(t).assign(vec); // this one is faster
+        EncodingHelpers.putTimeStep(encoding, batchIndex, t, vec);
       }
       
     }

@@ -3,6 +3,7 @@ package de.datexis.sector.tagger;
 import de.datexis.common.Resource;
 import de.datexis.encoder.Encoder;
 import de.datexis.encoder.EncoderSet;
+import de.datexis.encoder.EncodingHelpers;
 import de.datexis.encoder.LookupCacheEncoder;
 import de.datexis.model.Dataset;
 import de.datexis.model.Document;
@@ -11,23 +12,41 @@ import de.datexis.sector.eval.ClassificationScoreCalculator;
 import de.datexis.sector.tagger.DocumentSentenceIterator.Stage;
 import de.datexis.tagger.Tagger;
 import org.deeplearning4j.api.storage.StatsStorage;
+import org.deeplearning4j.earlystopping.EarlyStoppingConfiguration;
+import org.deeplearning4j.earlystopping.EarlyStoppingResult;
+import org.deeplearning4j.earlystopping.listener.EarlyStoppingListener;
+import org.deeplearning4j.earlystopping.trainer.EarlyStoppingGraphTrainer;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.*;
-import org.deeplearning4j.nn.conf.graph.*;
+import org.deeplearning4j.nn.conf.graph.MergeVertex;
+import org.deeplearning4j.nn.conf.graph.PreprocessorVertex;
+import org.deeplearning4j.nn.conf.graph.SubsetVertex;
 import org.deeplearning4j.nn.conf.inputs.InputType;
-import org.deeplearning4j.nn.conf.layers.*;
+import org.deeplearning4j.nn.conf.layers.DenseLayer;
+import org.deeplearning4j.nn.conf.layers.LSTM;
+import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
+import org.deeplearning4j.nn.conf.layers.recurrent.Bidirectional;
 import org.deeplearning4j.nn.conf.preprocessor.FeedForwardToRnnPreProcessor;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.weights.WeightInit;
+import org.deeplearning4j.nn.workspace.LayerWorkspaceMgr;
+import org.deeplearning4j.optimize.api.TrainingListener;
+import org.deeplearning4j.optimize.listeners.PerformanceListener;
+import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.ui.api.UIServer;
 import org.deeplearning4j.ui.stats.StatsListener;
 import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.deeplearning4j.util.ModelSerializer;
-import org.nd4j.shade.jackson.annotation.JsonIgnore; // it is import to use the nd4j version in this class!
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.MultiDataSet;
+import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Adam;
+import org.nd4j.linalg.lossfunctions.ILossFunction;
+import org.nd4j.linalg.schedule.ExponentialSchedule;
+import org.nd4j.linalg.schedule.ScheduleType;
+import org.nd4j.shade.jackson.annotation.JsonIgnore;
+import org.nd4j.shade.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,20 +55,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
-import org.deeplearning4j.earlystopping.EarlyStoppingConfiguration;
-import org.deeplearning4j.earlystopping.EarlyStoppingResult;
-import org.deeplearning4j.earlystopping.listener.EarlyStoppingListener;
-import org.deeplearning4j.earlystopping.trainer.EarlyStoppingGraphTrainer;
-import org.deeplearning4j.nn.conf.layers.recurrent.Bidirectional;
-import org.deeplearning4j.nn.workspace.LayerWorkspaceMgr;
-import org.deeplearning4j.optimize.api.TrainingListener;
-import org.deeplearning4j.optimize.listeners.PerformanceListener;
-import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.lossfunctions.ILossFunction;
-import org.nd4j.linalg.schedule.ExponentialSchedule;
-import org.nd4j.linalg.schedule.ScheduleType;
-import org.nd4j.shade.jackson.databind.JsonNode;
 
 /**
  * SECTOR Recurrent Network with separated FW/BW layers. Implementation of:
@@ -523,15 +528,15 @@ public class SectorTagger extends Tagger {
       int batchIndex = 0; for(Document doc : batch.docs) {
         int t = 0;
         for(Sentence s : doc.getSentences()) {
-          INDArray targetVec = target.getRow(batchIndex).getColumn(t); //target.get(new INDArrayIndex[] {point(batchIndex), all(), point(t)});
+          INDArray targetVec = EncodingHelpers.getTimeStep(target, batchIndex, t);
           s.putVector(targetEncoder.getClass(), targetVec);
           if(embedding != null) {
-            INDArray embeddingVec = embedding.getRow(batchIndex).getColumn(t); //embedding.get(new INDArrayIndex[] {point(batchIndex), all(), point(t)});
+            INDArray embeddingVec = EncodingHelpers.getTimeStep(embedding, batchIndex, t);
             s.putVector(SectorEncoder.class, embeddingVec);
           }
           if(embeddingFW != null) {
-            INDArray fw = embeddingFW.getRow(batchIndex).getColumn(t); //embeddingFW.get(new INDArrayIndex[] {point(batchIndex), all(), point(t)});
-            INDArray bw = embeddingBW.getRow(batchIndex).getColumn(t); //embeddingBW.get(new INDArrayIndex[] {point(batchIndex), all(), point(t)});
+            INDArray fw = EncodingHelpers.getTimeStep(embeddingFW, batchIndex, t);
+            INDArray bw = EncodingHelpers.getTimeStep(embeddingBW, batchIndex, t);
             s.putVector("embeddingFW", fw);
             s.putVector("embeddingBW", bw);
           }

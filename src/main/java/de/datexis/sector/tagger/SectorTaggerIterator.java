@@ -3,17 +3,10 @@ package de.datexis.sector.tagger;
 import com.google.common.collect.Lists;
 import de.datexis.encoder.Encoder;
 import de.datexis.encoder.EncoderSet;
-import de.datexis.model.Annotation;
-import de.datexis.model.Dataset;
-import de.datexis.model.Document;
-import de.datexis.model.Sentence;
-import de.datexis.model.Span;
-import de.datexis.model.Token;
+import de.datexis.encoder.EncodingHelpers;
+import de.datexis.model.*;
 import de.datexis.sector.encoder.ClassEncoder;
-import de.datexis.sector.encoder.ClassTag;
 import de.datexis.sector.encoder.HeadingEncoder;
-import de.datexis.sector.encoder.HeadingTag;
-
 import de.datexis.sector.model.SectionAnnotation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.MultiDataSet;
@@ -25,10 +18,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.nd4j.linalg.indexing.INDArrayIndex;
-import static org.nd4j.linalg.indexing.NDArrayIndex.all;
-import static org.nd4j.linalg.indexing.NDArrayIndex.point;
 
 /**
  * Iterates through a Dataset with Document-Level Batches of Sentences
@@ -140,7 +129,7 @@ public class SectorTaggerIterator extends DocumentSentenceIterator {
           ann = it.next();
           vec = encodeTag(tagger.targetEncoder, ann);
         }
-        encoding.getRow(batchIndex).getColumn(t).assign(vec.dup()); // this one is faster
+        EncodingHelpers.putTimeStep(encoding, batchIndex, t, vec.dup());
       }
       
     }

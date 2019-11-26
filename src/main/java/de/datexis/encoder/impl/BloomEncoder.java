@@ -1,17 +1,19 @@
 package de.datexis.encoder.impl;
 
-import de.datexis.hash.BitArrayBloomFilter;
-import de.datexis.hash.BitArrayBloomFilterStrategy;
 import com.google.common.hash.Funnels;
 import de.datexis.common.Resource;
 import de.datexis.common.WordHelpers;
+import de.datexis.hash.BitArrayBloomFilter;
+import de.datexis.hash.BitArrayBloomFilterStrategy;
 import de.datexis.model.Document;
 import de.datexis.model.Span;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import org.apache.commons.io.output.CloseShieldOutputStream;
+import org.nd4j.linalg.api.buffer.DataType;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -19,10 +21,6 @@ import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-import org.apache.commons.io.output.CloseShieldOutputStream;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
-import org.slf4j.LoggerFactory;
 
 /**
  * A Stub for Bloom Filter Encoder on top of Bag Of Words
@@ -72,22 +70,25 @@ public class BloomEncoder extends BagOfWordsEncoder {
   
   @Override
   public INDArray encode(Iterable<? extends Span> spans) {
-    INDArray vector = Nd4j.zeros(getEmbeddingVectorSize(), 1);
+    INDArray vector = Nd4j.zeros(DataType.FLOAT, getEmbeddingVectorSize(), 1);
     for(Span s : spans) {
       double[] bits = bloom.getBitArray(preprocessor.preProcess(s.getText()));
-      INDArray x = Nd4j.create(bits);
-      vector.addi(x.transposei());
+      INDArray x = Nd4j.create(bits, new long[]{getEmbeddingVectorSize(), 1}).castTo(DataType.FLOAT);
+      vector.addi(x);
+    }
+    for(long i = 0; i < vector.length(); i++) {
+      if(vector.getDouble(i) > 0.) vector.putScalar(i, 1.); // maximum value 1
     }
     return vector;
   }
   
   @Override
   public INDArray encode(String[] words) {
-    INDArray vector = Nd4j.zeros(getEmbeddingVectorSize(), 1);
+    INDArray vector = Nd4j.zeros(DataType.FLOAT, getEmbeddingVectorSize(), 1);
     for(String s : words) {
       double[] bits = bloom.getBitArray(preprocessor.preProcess(s));
-      INDArray x = Nd4j.create(bits);
-      vector.addi(x.transposei());
+      INDArray x = Nd4j.create(bits, new long[]{getEmbeddingVectorSize(), 1}).castTo(DataType.FLOAT);
+      vector.addi(x);
     }
     return vector;
   }
